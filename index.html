@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Hub Card Generator</title>
+</head>
+<body style="display:flex; justify-content:center; align-items:center; height: 100vh; padding: 0; margin: 0; background-color: aliceblue;">
+    <div>
+        <div style="box-shadow: 0 8px 12px 0 rgba(0,0,0,0.4); border-radius: 5px; padding: 5px; margin: 5px;">
+            <form style="display: block; justify-items: center;">
+                <p><label style="padding: 10px;">Enter the username</label><input type="text" id="userName" style="padding: 5px; border-radius: 5px; border: 1px solid black;"></p>
+                <button  id="generateCard" style="padding: 5px; background-color: rgb(0, 255, 166); margin-bottom: 10px; border-radius: 5px; border: 1px solid black;">Generate Card</button>            </form>
+        </div>
+        <div class="card"></div>
+    </div>
+</body>
+<script>
+    const form=document.querySelector('form')
+    const generateCard=document.getElementById('generateCard')
+    const card=document.querySelector('.card');
+
+
+    const randomColor = function () {
+        const hex='0123456789ABCDEF';
+        let color='#';
+        for(let i=0;i<6;i++)
+        {
+            color += hex[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    };
+
+    form.addEventListener('submit', function(e){
+        e.preventDefault();
+        inputUser();
+        // const username=userName.value;
+    })
+
+    inputUser = function(){
+        const username=userName.value;
+        // console.log(typeof(username));
+        if(!username){
+            alert('Please enter Valid username');
+        }
+        else{
+            dataFetch(username)
+        }
+    }
+
+    function dataFetch(username) {
+        const requestUrl = `https://api.github.com/users/${username}`
+        console.log(requestUrl);
+        const xhr= new XMLHttpRequest();
+        xhr.open('GET',requestUrl)
+        xhr.onreadystatechange = function(){
+            console.log(xhr.readyState);
+            if(xhr.readyState === 4){
+                const data=JSON.parse(this.responseText);
+                // console.log(data);
+                dataForCard(data);
+            }
+        }
+        xhr.send();
+    }
+
+    function dataForCard (data){
+        console.log(data);
+        const avatar = data.avatar_url;
+        const name = data.name;
+        const followers = data.followers;
+        const following = data.following;
+        const repos = data.public_repos;
+        const url = data.html_url;
+        if(!name){
+            alert('User not found Please enter valid username')
+        }
+        else{
+            card.innerHTML = `<div class="GITcard" style="box-shadow: 0 8px 12px 0 rgba(0,0,0,0.4); border-radius: 5px; padding: 5px; display: block; height: 550px; width: 400px; background-color:${randomColor()}">
+                    <h1 style="text-align:center; font-size: 30px; font-family: system-ui;">Git Hub Card</h1>
+                <div style="display:flex; justify-content:center; padding: 10px">
+                    
+                    <img src="${avatar}" alt="Avatar" style="height: 220px; border: 2px solid black; border-radius: 100%; box-shadow: 0 8px 12px 0 rgba(0,0,0,0.4);">
+                </div>
+                <div class="container" style="box-shadow: 0 8px 12px 0 rgba(0,0,0,0.4); border-radius: 5px; padding: 5px; margin: 5px; display:block; justify-content:center; text-align: center; font-family: system-ui">
+                    <h4 style="text-align: center"><b>${name}</b></h4>
+                    <p>Followers ${followers}</p>
+                    <p>Following ${following}</p>
+                    <p>Repos ${repos}</p>
+                    <a href='${url}' style="text-decoration: none; color: hotpink;">Link: ${url}</a>
+                </div>
+            </div>`
+        }
+    }
+
+</script>
+</html>
